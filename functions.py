@@ -17,7 +17,7 @@ def getEmails(soup):
 	if soup is not None:
 		groups = emailRegex.findall(str(soup))
 		return groups
-	return
+	return []
 
 def getSoupFromLink(pageUrl):
 	r = requests.get(startingUrl + getRelativeUrl(pageUrl))
@@ -79,8 +79,9 @@ def expandOnLink(start,soup, startingUrl):
 
 	lastLink = max(maxTest)
 	for i in range(1, lastLink+1):
-		allLinks.append("{}{}".format(start, i))
-
+		link = "{}{}".format(start,i)
+		if link not in allLinks:
+			allLinks.append(link)
 	return allLinks
 
 
@@ -121,14 +122,22 @@ def getLinks(pageUrl):
 
 	return pages
 
-def writeToFile(content, filename):
+def writeToFile(threadUrl, content, filename):
 	# open file for writing
 	with open(filename, "w") as f:
+		f.writelines((threadUrl, "\n"))
+
 		for e in content:
 			f.writelines(e)
 			f.write("\n")
 	print("File {} written".format(filename))
 
+def checkFile(filename):
+	# checks if the file name alreday exists
+	import os
+	if os.path.isfile(filename):
+		return True
+	return False
 
 def getAllLinks(soup):
 	allLinks = []
@@ -138,4 +147,13 @@ def getAllLinks(soup):
 			if link.attrs['href'] not in allLinks:
 				allLinks.append(link.attrs['href'])
 
-	return allLinks
+	return allLink
+
+
+
+
+def getLinkFromFile(filename):
+	name = ""
+	with open(filename, "r") as f:
+		name = f.readline()
+	return name
